@@ -59,6 +59,7 @@ buttonsObj['select-folder-button'].onclick = electronAPI.openVideoFolder;
 buttonsObj['copy-data-button'].onclick = dataToClipboard;
 buttonsObj['next-video-button'].onclick = handleNextVideo;
 buttonsObj['prev-video-button'].onclick = handlePrevVideo;
+buttonsObj['replay-video-button'].onclick = handleReplayVideo;
 buttonsObj['append-button'].onclick = handleAppend;
 buttonsObj['delete-button'].onclick = handleDelete;
 buttonsObj['first-last-button'].onclick = markFirstLast;
@@ -104,7 +105,8 @@ Object.keys(checkFieldLinks).forEach((checkId) => {
             const newDisplay = event.target.checked ? 'block' : 'none';
             checkFieldLinks[checkId].forEach(
                 (textId) =>
-                    (document.getElementById(textId).style.display = newDisplay)
+                    (document.getElementById(textId).style.display =
+                        newDisplay),
             );
 
             updateOutput();
@@ -207,6 +209,10 @@ function handlePrevVideo() {
     changeVideo();
 }
 
+function handleReplayVideo() {
+    electronAPI.replayVideo();
+}
+
 function handleAppend() {
     let newText = inputsObj['description'].value;
     if (inputsObj['vocalizations'].checked) {
@@ -239,19 +245,19 @@ function handleRename({
 }) {
     if (!videoFolderPath) {
         errorAlert(
-            'Error renaming file. No video folder specified. Please select a folder with video files in it.'
+            'Error renaming file. No video folder specified. Please select a folder with video files in it.',
         );
     } else if (!oldName) {
         errorAlert(
-            'Error renaming file. No old/original file name specified Make sure you have selected a video file.'
+            'Error renaming file. No old/original file name specified Make sure you have selected a video file.',
         );
     } else if (!newText) {
         errorAlert(
-            'Error renaming file. No new text specified for renaming. Make sure you type something in the "What\'s in the video" field.'
+            'Error renaming file. No new text specified for renaming. Make sure you type something in the "What\'s in the video" field.',
         );
     } else if (!type) {
         errorAlert(
-            'Error renaming file. No renaming type specified. Valid types: append, prepend, replace.'
+            'Error renaming file. No renaming type specified. Valid types: append, prepend, replace.',
         );
     } else {
         electronAPI.renameFile({
@@ -298,7 +304,7 @@ async function dataToClipboard() {
     const { success, error } = await electronAPI.dataToClipboard({ toCopy });
     if (success) {
         console.log(
-            'Successfully copied to clipboard Todo: Give user feedback here'
+            'Successfully copied to clipboard Todo: Give user feedback here',
         );
     } else {
         errorAlert(error);
@@ -329,7 +335,7 @@ function parseDateAndTime(videoDateObj) {
         return { date: parsedDate, time: parsedTime };
     } else {
         errorAlert(
-            `Error: parseDateAndTime called without DateTime object. Received: ${videoDateObj}`
+            `Error: parseDateAndTime called without DateTime object. Received: ${videoDateObj}`,
         );
         return null;
     }
@@ -340,7 +346,7 @@ electronAPI.onVideoFolderOpened(
     async (event, { folderPath, videos, error }) => {
         if (error) {
             errorAlert(
-                `Error getting video list and folder Path.\nError Details: ${error}`
+                `Error getting video list and folder Path.\nError Details: ${error}`,
             );
             folderTextDiv.innerText = '';
         } else {
@@ -361,7 +367,7 @@ electronAPI.onVideoFolderOpened(
                     ) {
                         // Grabs the last 2 characters in the string and converts them to an integer (if possible)
                         const prevSeconds = Number.parseInt(
-                            videoData[i - 1].time.slice(-2)
+                            videoData[i - 1].time.slice(-2),
                         );
                         if (Number.isInteger(prevSeconds)) {
                             const newSeconds = prevSeconds + 1;
@@ -391,7 +397,7 @@ electronAPI.onVideoFolderOpened(
 
             videoSelector.replaceChildren(...newOptions);
         }
-    }
+    },
 );
 
 electronAPI.onVideoChanged((event, { videoDateObj }) => {
@@ -424,7 +430,7 @@ electronAPI.onFileRenamed(
             errorAlert(error);
         } else {
             const index = videoData.findIndex(
-                (video) => video.fileName == oldName
+                (video) => video.fileName == oldName,
             );
             if (index >= 0 && videoData.length > 0) {
                 // Update data
@@ -443,10 +449,10 @@ electronAPI.onFileRenamed(
                 }
             } else {
                 errorAlert(
-                    'Error updating select option after renaming file. Could not find option with old video name'
+                    'Error updating select option after renaming file. Could not find option with old video name',
                 );
                 errorAlert(`oldName: ${oldName}\nnewName: ${newName}`);
             }
         }
-    }
+    },
 );

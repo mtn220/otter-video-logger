@@ -68,6 +68,11 @@ async function handleChangeVideo(event, { folderPath, fileName }) {
 function handleSetVideoCSS(event, { name, value }) {
     videoWindow.webContents.send('set-video-css', { name, value });
 }
+
+function handleReplayVideo(event) {
+    videoWindow.webContents.send('replay-video');
+}
+
 function handleDataToClipboard(event, { toCopy }) {
     try {
         clipboard.writeText(toCopy);
@@ -79,12 +84,12 @@ function handleDataToClipboard(event, { toCopy }) {
 
 async function handleRenameFile(
     event,
-    { oldName, newText, type, folderPath, retryCount = 0, ...rest }
+    { oldName, newText, type, folderPath, retryCount = 0, ...rest },
 ) {
     try {
         if (retryCount >= 10) {
             throw new Error(
-                'Error while renaming file in handleRenameFile. Reached max retries. Resource busy.'
+                'Error while renaming file in handleRenameFile. Reached max retries. Resource busy.',
             );
         }
         // Clear the video source from the current video so the video will stop being accessed while trying to rename the file
@@ -128,7 +133,7 @@ async function handleRenameFile(
                         retryCount: retryCount + 1,
                         ...rest,
                     }),
-                500
+                500,
             );
         } else {
             console.error('Error renaming file in handleRenameFile');
@@ -176,6 +181,7 @@ app.whenReady().then(() => {
     ipcMain.on('change-video', handleChangeVideo);
     ipcMain.on('rename-file', handleRenameFile);
     ipcMain.on('set-video-css', handleSetVideoCSS);
+    ipcMain.on('replay-video', handleReplayVideo);
     ipcMain.handle('data-to-clipboard', handleDataToClipboard);
     ipcMain.handle('get-platform', (event) => process.platform);
 

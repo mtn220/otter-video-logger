@@ -5,6 +5,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     onVideoFolderOpened: (callback) =>
         ipcRenderer.on('video-folder-opened', callback),
     changeVideo: (args) => ipcRenderer.send('change-video', args),
+    replayVideo: (args) => ipcRenderer.send('replay-video', args),
     onVideoChanged: (callback) => ipcRenderer.on('video-changed', callback),
     dataToClipboard: (args) => ipcRenderer.invoke('data-to-clipboard', args),
     getPlatform: () => ipcRenderer.invoke('get-platform'),

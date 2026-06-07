@@ -11,3 +11,8 @@ electronAPI.onClearVideoSrc((event) => {
 electronAPI.onSetVideoCSS((event, { name, value }) => {
     videoEl.style[name] = value;
 });
+
+electronAPI.onReplayVideo((event) => {
+    // videoEl.style[name] = value;
+    console.log('Replaying video');
+});
