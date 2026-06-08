@@ -1,25 +1,19 @@
 {
-    "name": "OtterLogger",
-    "version": "0.1.0",
-    "description": "Helper tool for logging River Otter Ecology Project video metadata",
-    "main": "main.js",
-    "scripts": {
-        "start": "electron-forge start",
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "package": "electron-forge package",
-        "make": "electron-forge make"
-    },
-    "author": "DaveB",
-    "license": "ISC",
-    "devDependencies": {
-        "@electron-forge/cli": "^6.3.0",
-        "@electron-forge/maker-dmg": "^6.4.2",
-        "@electron-forge/maker-squirrel": "^6.3.0",
-        "@electron-forge/maker-zip": "^6.3.0",
-        "@electron-forge/plugin-auto-unpack-natives": "^6.3.0",
-        "electron": "^25.5.0"
-    },
-    "dependencies": {
-        "electron-squirrel-startup": "^1.0.0"
-    }
+  "name": "otter-logger",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "tauri": "tauri"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2",
+    "vite": "^8.0.16"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2.11.0",
+    "bootstrap": "^5.3.8"
+  }
 }

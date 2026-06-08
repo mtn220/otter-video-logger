@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            http-equiv="Content-Security-Policy"
+            content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; media-src blob:; img-src 'self' data:; connect-src ipc: http://ipc.localhost http://localhost:5173 http://tauri.localhost;"
+        />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Otter Logger</title>
+    </head>
+    <body>
+        <div class="alerts-container" id="alerts-container"></div>
+        <div class="container">
+            <div class="tool-row-flex">
+                <button
+                    id="select-folder-button"
+                    class="btn btn-success my-1 me-2"
+                >
+                    Select Video Folder
+                </button>
+                <div id="folder-text-field" class="my-auto form-text"></div>
+            </div>
+            <div class="tool-row">
+                <select id="video-selector" class="form-select" size="10">
+                    <option value="">
+                        ↑ Select the folder with the camera videos
+                    </option>
+                </select>
+            </div>
+            <div class="tool-section">
+                <div class="tool-row">
+                    <button class="btn btn-primary me-1" id="first-last-button">
+                        Mark First & Last
+                    </button>
+                    <button class="btn btn-danger" id="delete-button">
+                        Mark For Deletion
+                    </button>
+                </div>
+                <div class="tool-row">
+                    <div class="tool-row-flex">
+                        <button
+                            class="btn btn-success me-2"
+                            id="prev-video-button"
+                        >
+                            Previous Video
+                        </button>
+                        <button class="btn btn-success me-2" id="next-video-button">
+                            Next Video
+                        </button>
+                        <button
+                            class="btn btn-success"
+                            id="replay-video-button"
+                        >
+                            Replay Video
+                        </button>
+                    </div>
+                    <div class="tool-row-flex align-items-center">
+                        <label for="brightness-slider" class="form-label me-2"
+                            >Video Brightness</label
+                        >
+                        <button
+                            class="btn btn-success btn-sm"
+                            id="reset-brightness-button"
+                        >
+                            Reset
+                        </button>
+                        <input
+                            type="range"
+                            class="form-range mx-4"
+                            id="brightness-slider"
+                            min="0"
+                            max="600"
+                            value="100"
+                        />
+                    </div>
+                </div>
+            </div>
+            <div class="tool-row">
+                <div class="tool-section">
+                    <div class="row">
+                        <div class="col-sm">
+                            <label for="date" class="tool-row field-label">
+                                Video Date (YYYY-MM-DD)
+                            </label>
+                            <input
+                                type="text"
+                                class="form-control field"
+                                id="date"
+                            />
+                        </div>
+                        <div class="col-sm">
+                            <label for="time" class="tool-row field-label">
+                                Video Time (HH-MM-00)
+                            </label>
+                            <input
+                                type="text"
+                                class="form-control field"
+                                id="time"
+                            />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm">
+                            <label for="initials" class="tool-row field-label">
+                                Staff Initials
+                            </label>
+                            <input
+                                type="text"
+                                class="form-control field"
+                                id="initials"
+                            />
+                        </div>
+                        <div class="col-sm">
+                            <label for="site-code" class="tool-row field-label">
+                                Site Code
+                            </label>
+                            <input
+                                type="text"
+                                class="form-control field"
+                                id="site-code"
+                            />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm">
+                            <label
+                                for="num-otters"
+                                class="tool-row field-label"
+                            >
+                                Number of Otters
+                            </label>
+                            <input
+                                type="text"
+                                class="form-control field"
+                                id="num-otters"
+                            />
+                        </div>
+                        <div class="col-sm">
+                            <label
+                                for="num-adults"
+                                class="tool-row field-label"
+                            >
+                                Number of Adults
+                            </label>
+                            <input
+                                type="text"
+                                class="form-control field"
+                                id="num-adults"
+                            />
+                        </div>
+                        <div class="col-sm">
+                            <label for="num-pups" class="tool-row field-label">
+                                Number of Pups
+                            </label>
+                            <input
+                                type="text"
+                                class="form-control field"
+                                id="num-pups"
+                            />
+                        </div>
+                    </div>
+                    <div class="tool-row">
+                        <label for="behavior" class="tool-row field-label">
+                            Behavior
+                        </label>
+                    </div>
+                    <div class="tool-row-flex justify-content-center">
+                        <div class="flex-grow-1">
+                            <input
+                                type="text"
+                                class="form-control field"
+                                id="behavior"
+                            />
+                        </div>
+                        <div
+                            class="append-container"
+                            id="behavior-append-container"
+                        >
+                            <div
+                                class="append-text"
+                                id="behavior-vocalizations-append"
+                            >
+                                Vocalizations
+                            </div>
+                            <div class="append-text" id="behavior-prey-append">
+                                Prey Species
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tool-row-flex mt-2">
+                        <div class="form-check me-3">
+                            <input
+                                class="form-check-input"
+                                type="checkbox"
+                                id="vocalizations"
+                            />
+                            <label class="form-check-label" for="vocalizations">
+                                Vocalizations
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input
+                                class="form-check-input"
+                                type="checkbox"
+                                id="prey"
+                            />
+                            <label class="form-check-label" for="prey">
+                                Prey Species
+                            </label>
+                        </div>
+                    </div>
+                    <div class="tool-row">
+                        <label for="note" class="tool-row field-label">
+                            Note (optional)
+                        </label>
+                        <input
+                            type="text"
+                            class="form-control field"
+                            id="note"
+                        />
+                    </div>
+                    <div class="mt-3">
+                        <div class="fw-bold">Excel Row Data:</div>
+                        <div id="output"></div>
+                    </div>
+                    <div class="tool-row-flex align-items-center">
+                        <button
+                            class="btn btn-primary my-2"
+                            id="copy-data-button"
+                        >
+                            Copy Excel Row To Clipboard
+                        </button>
+                        <div class="ms-3" id="paste-instructions"></div>
+                    </div>
+                </div>
+                <div class="tool-section">
+                    <div class="row">
+                        <div class="col-sm">
+                            <label
+                                for="description"
+                                class="tool-row field-label"
+                            >
+                                What's In The Video?
+                            </label>
+                            <button
+                                class="btn btn-secondary btn-sm ms-1"
+                                id="append-otter-button"
+                            >
+                                Otter
+                            </button>
+
+                            <div class="tool-row">
+                                <input
+                                    type="text"
+                                    class="form-control field mt-1"
+                                    id="description"
+                                />
+                            </div>
+                            <div class="tool-row-flex">
+                                <button
+                                    class="btn btn-primary"
+                                    id="append-button"
+                                    disabled
+                                >
+                                    Append To Filename
+                                </button>
+                                <div
+                                    class="append-container"
+                                    id="description-append-container"
+                                >
+                                    <div
+                                        class="append-text"
+                                        id="description-vocalizations-append"
+                                    >
+                                        Vocalizations
+                                    </div>
+                                    <div
+                                        class="append-text"
+                                        id="description-prey-append"
+                                    >
+                                        Prey Species
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm">
+                            <label for="file-name" class="tool-row field-label">
+                                File Name
+                            </label>
+
+                            <div class="tool-row">
+                                <input
+                                    type="text"
+                                    class="form-control field mt-1"
+                                    id="file-name"
+                                />
+                            </div>
+                            <button
+                                class="btn btn-primary me-2"
+                                id="change-file-name-button"
+                                disabled
+                            >
+                                Change
+                            </button>
+                            <button
+                                class="btn btn-primary"
+                                id="reset-file-name-button"
+                                disabled
+                            >
+                                Reset
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+    <script type="module" src="./tools.js"></script>
+</html>
