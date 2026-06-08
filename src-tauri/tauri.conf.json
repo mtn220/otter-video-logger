@@ -1,0 +1,34 @@
+{
+    "$schema": "https://schema.tauri.app/config/2",
+    "productName": "Otter Logger",
+    "version": "0.1.1",
+    "identifier": "com.roep.otterlogger",
+    "build": {
+        "beforeDevCommand": "npm run dev",
+        "beforeBuildCommand": "npm run build",
+        "devUrl": "http://localhost:5173",
+        "frontendDist": "../dist"
+    },
+    "app": {
+        "withGlobalTauri": true,
+        "windows": [],
+        "security": {
+            "csp": null,
+            "assetProtocol": {
+                "enable": true,
+                "scope": ["**"]
+            }
+        }
+    },
+    "bundle": {
+        "active": true,
+        "targets": "all",
+        "icon": [
+            "icons/32x32.png",
+            "icons/128x128.png",
+            "icons/128x128@2x.png",
+            "icons/icon.icns",
+            "icons/icon.ico"
+        ]
+    }
+}
