@@ -258,7 +258,7 @@ function handleFileNameInput() {
 }
 
 function handleNextVideo() {
-    if (videoSelector.selectedIndex < videoData.length - 2) {
+    if (videoSelector.selectedIndex < videoData.length - 1) {
         videoSelector.selectedIndex++;
     }
     changeVideo();
