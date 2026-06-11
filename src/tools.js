@@ -12,7 +12,16 @@ const folderTextDiv = document.querySelector('#folder-text-field');
 const outputDiv = document.querySelector('#output');
 const alertsContainer = document.querySelector('#alerts-container');
 const videoSelector = document.querySelector('#video-selector');
-videoSelector.addEventListener('change', changeVideo);
+let lastTriggeredVideoValue = null;
+function handleVideoSelectorEvent() {
+    const value = videoSelector.value;
+    if (value && value !== lastTriggeredVideoValue) {
+        lastTriggeredVideoValue = value;
+        changeVideo();
+    }
+}
+videoSelector.addEventListener('change', handleVideoSelectorEvent);
+videoSelector.addEventListener('mousedown', handleVideoSelectorEvent);
 const pasteInstructions = document.querySelector('#paste-instructions');
 
 invoke('get_platform').then((response) => {
@@ -107,6 +116,7 @@ buttonsObj['select-folder-button'].onclick = async () => {
         newOptions.push(opt);
     }
 
+    lastTriggeredVideoValue = null;
     videoSelector.replaceChildren(...newOptions);
 };
 
@@ -408,12 +418,13 @@ function updateFormForVideo(index) {
 
 async function changeVideo() {
     const newVideoName = videoSelector.value;
+    const index = videoSelector.selectedIndex;
     if (newVideoName) {
         await invoke('change_video', {
             folderPath: videoFolderPath,
             fileName: newVideoName,
         });
-        updateFormForVideo(videoSelector.selectedIndex);
+        updateFormForVideo(index);
     }
 }
 
