@@ -260,7 +260,7 @@ pub fn run() {
                 "tools",
                 tauri::WebviewUrl::App("index.html".into()),
             )
-            .title("Otter Logger")
+            .title("Otter Video Logger")
             .inner_size(tools_width, win_height)
             .build()?;
 
@@ -269,7 +269,7 @@ pub fn run() {
                 "video",
                 tauri::WebviewUrl::App("video.html".into()),
             )
-            .title("Otter Logger - Video")
+            .title("Otter Video Logger - Video")
             .inner_size(video_width, win_height)
             .build()?;
 

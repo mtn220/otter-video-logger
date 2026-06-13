@@ -1,5 +1,5 @@
 [package]
-name = "otter-logger"
+name = "otter-video-logger"
 version = "0.1.1"
 description = "Helper tool for logging River Otter Ecology Project video metadata"
 authors = ["mtn220", "roep"]
@@ -11,7 +11,7 @@ edition = "2021"
 # The `_lib` suffix may seem redundant but it is necessary
 # to make the lib name unique and wouldn't conflict with the bin name.
 # This seems to be only an issue on Windows, see https://github.com/rust-lang/cargo/issues/8519
-name = "otter_logger_lib"
+name = "otter_video_logger_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]

@@ -2,5 +2,5 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 fn main() {
-    otter_logger_lib::run()
+    otter_video_logger_lib::run()
 }

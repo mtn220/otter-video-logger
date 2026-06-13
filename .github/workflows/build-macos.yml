@@ -1,0 +1,54 @@
+name: Build macOS
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
+
+      - name: Install frontend dependencies
+        run: npm install
+
+      - name: Build Tauri app (unsigned)
+        run: npm run tauri -- build --bundles dmg,app
+        # No signing env vars set → unsigned build.
+        # To sign later, add:
+        #   APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}           # base64 .p12
+        #   APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+        #   APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }} # "Developer ID Application: Name (TEAMID)"
+        # To notarize (required for Gatekeeper-clean distribution), also add:
+        #   APPLE_ID: ${{ secrets.APPLE_ID }}
+        #   APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}                 # app-specific password
+        #   APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+
+      - name: Upload DMG
+        uses: actions/upload-artifact@v4
+        with:
+          name: otter-video-logger-macos-dmg
+          path: src-tauri/target/release/bundle/dmg/*.dmg
+
+      - name: Upload .app
+        uses: actions/upload-artifact@v4
+        with:
+          name: otter-video-logger-macos-app
+          path: src-tauri/target/release/bundle/macos/*.app
