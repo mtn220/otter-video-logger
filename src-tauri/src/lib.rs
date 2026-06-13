@@ -202,11 +202,6 @@ async fn data_to_clipboard(text: String) -> Result<(), String> {
 }
 
 #[tauri::command]
-fn open_devtools(window: tauri::WebviewWindow) {
-    window.open_devtools();
-}
-
-#[tauri::command]
 fn get_platform() -> &'static str {
     #[cfg(target_os = "macos")]
     {
@@ -302,7 +297,6 @@ pub fn run() {
             rename_file,
             data_to_clipboard,
             get_platform,
-            open_devtools,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

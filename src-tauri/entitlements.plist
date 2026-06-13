@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Required for Mac App Store distribution -->
+    <key>com.apple.security.app-sandbox</key>
+    <true/>
+
+    <!-- Read + write access to files/folders the user explicitly opens via dialog.
+         Covers: listing directory contents, reading video files via asset protocol,
+         and renaming files (std::fs::rename requires write permission on the parent dir). -->
+    <key>com.apple.security.files.user-selected.read-write</key>
+    <true/>
+
+    <!-- Clipboard write (arboard::Clipboard::set_text) is permitted inside the
+         sandbox by default; no additional entitlement is required. -->
+</dict>
+</plist>
