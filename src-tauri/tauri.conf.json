@@ -1,7 +1,6 @@
 {
     "$schema": "https://schema.tauri.app/config/2",
     "productName": "Otter Video Logger",
-    "version": "0.1.1",
     "identifier": "com.roep.otterlogger",
     "build": {
         "beforeDevCommand": "npm run dev",
