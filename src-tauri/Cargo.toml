@@ -1,6 +1,6 @@
 [package]
 name = "otter-logger"
-version = "0.1.1"
+version = "0.1.3"
 description = "Helper tool for logging River Otter Ecology Project video metadata"
 authors = ["mtn220", "roep"]
 edition = "2021"
