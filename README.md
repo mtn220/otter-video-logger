@@ -1,4 +1,4 @@
-# Otter Logger
+# Otter Video Logger
 
 A desktop app for logging River Otter Ecology Project video metadata. Built with [Tauri](https://tauri.app/) (Rust + Vite).
 
@@ -28,7 +28,7 @@ Installers are distributed per platform and CPU architecture. If you're unsure w
 > macOS will block unsigned apps with a Gatekeeper warning by default.
 
 1. Download the `.dmg` for your chip (`aarch64` for Apple Silicon, `x86_64` for Intel).
-2. Open the `.dmg` and drag **Otter Logger** to your Applications folder.
+2. Open the `.dmg` and drag **Otter Video Logger** to your Applications folder.
 3. The first time you try to open the app, macOS will block it. To bypass this:
    - **Right-click** (or Control-click) the app in Finder and select **Open**.
    - In the dialog that appears, click **Open** to confirm.
@@ -52,7 +52,7 @@ Install the following before cloning:
 
 ```bash
 git clone <repo-url>
-cd otter-logger
+cd otter-video-logger
 npm install
 npm run tauri dev
 ```
@@ -81,3 +81,21 @@ Subdirectories by format:
 | macOS | App bundle (`.app`) | `bundle/macos/` |
 
 The build targets your current machine's OS and architecture. To produce builds for other platforms or architectures, use a machine of that type or configure cross-compilation separately.
+
+### CI/CD (GitHub Actions)
+
+Releases are built automatically via GitHub Actions (`.github/workflows/build-macos.yml`).
+
+**Trigger:** push a version tag (e.g. `git tag v1.0.0 && git push --tags`) or run the workflow manually from the Actions tab.
+
+**What it does:**
+
+| Job | Runner | Output |
+|-----|--------|--------|
+| `build-macos` | `macos-latest` | `.app` bundle zipped as `Otter Video Logger.zip` |
+| `build-windows` | `windows-latest` | NSIS installer `.exe` |
+| `release` | `ubuntu-latest` | Draft GitHub release with both artifacts attached |
+
+The `release` job only runs on tag pushes. On manual runs, artifacts are available as workflow downloads but no release is created.
+
+**App signing:** not yet configured. macOS builds are unsigned (users will see a Gatekeeper warning); Windows builds are unsigned (users will see a SmartScreen warning). Code signing support is planned — the workflow already includes commented-out placeholders for the required secrets.
