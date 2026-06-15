@@ -32,26 +32,40 @@ jobs:
       - name: Install frontend dependencies
         run: npm install
 
-      - name: Build Tauri app (unsigned)
+      - name: Import Apple Certificate
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+        run: |
+          CERT_PATH=$RUNNER_TEMP/certificate.p12
+          KEYCHAIN_PATH=$RUNNER_TEMP/build.keychain
+          echo -n "$APPLE_CERTIFICATE" | base64 --decode -o $CERT_PATH
+          security create-keychain -p "temp-password" $KEYCHAIN_PATH
+          security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
+          security unlock-keychain -p "temp-password" $KEYCHAIN_PATH
+          security import $CERT_PATH -P "$APPLE_CERTIFICATE_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
+          security list-keychains -d user -s $KEYCHAIN_PATH
+
+      - name: Build Tauri app
+        env:
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: npm run tauri -- build --bundles app
-        # No signing env vars set → unsigned build.
-        # To sign later, add:
-        #   APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}           # base64 .p12
-        #   APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-        #   APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }} # "Developer ID Application: Name (TEAMID)"
-        # To notarize (required for Gatekeeper-clean distribution), also add:
-        #   APPLE_ID: ${{ secrets.APPLE_ID }}
-        #   APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}                 # app-specific password
-        #   APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+
+      - name: Clean up keychain
+        if: always()
+        run: security delete-keychain $RUNNER_TEMP/build.keychain
 
       - name: Zip .app
-        run: ditto -c -k --sequesterRsrc --keepParent "src-tauri/target/release/bundle/macos/Otter Video Logger.app" "Otter Video Logger.zip"
+        run: ditto -c -k --sequesterRsrc --keepParent "src-tauri/target/release/bundle/macos/Otter Video Logger.app" "Otter Video Logger macOS.zip"
 
       - name: Upload .app
         uses: actions/upload-artifact@v4
         with:
           name: otter-video-logger-macos-app
-          path: "Otter Video Logger.zip"
+          path: "Otter Video Logger macOS.zip"
 
   build-windows:
     runs-on: windows-latest
@@ -79,11 +93,16 @@ jobs:
       - name: Build Tauri app
         run: npm run tauri -- build --bundles nsis
 
+      - name: Rename installer
+        run: |
+          $src = Get-ChildItem src-tauri/target/release/bundle/nsis/*.exe | Select-Object -First 1
+          Copy-Item $src.FullName "Otter Video Logger Windows.exe"
+
       - name: Upload installer
         uses: actions/upload-artifact@v4
         with:
           name: otter-video-logger-windows-installer
-          path: src-tauri/target/release/bundle/nsis/*.exe
+          path: "Otter Video Logger Windows.exe"
 
   release:
     needs: [build-macos, build-windows]
