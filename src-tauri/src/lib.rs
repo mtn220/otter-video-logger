@@ -109,7 +109,7 @@ async fn open_video_folder(app: tauri::AppHandle) -> Result<Option<VideoFolderRe
         let entry = entry.map_err(|e| e.to_string())?;
         let name = entry.file_name().to_string_lossy().to_string();
         let ext = name.rsplit('.').next().unwrap_or("").to_lowercase();
-        if video_extensions.contains(&ext.as_str()) {
+        if !name.starts_with("._") && video_extensions.contains(&ext.as_str()) {
             let metadata = entry.metadata().map_err(|e| e.to_string())?;
             let modified_ms = metadata
                 .modified()
