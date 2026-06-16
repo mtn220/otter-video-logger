@@ -89,6 +89,83 @@ struct RenameResult {
     new_name: String,
 }
 
+/// Scans MP4 boxes from the current reader position, returns the byte offset of the
+/// named box's content (i.e. just past the box header).
+fn find_mp4_box<R: std::io::Read + std::io::Seek>(
+    reader: &mut R,
+    target: &[u8; 4],
+) -> Option<u64> {
+    use std::io::SeekFrom;
+    loop {
+        let box_start = reader.stream_position().ok()?;
+        let mut header = [0u8; 8];
+        reader.read_exact(&mut header).ok()?;
+
+        let raw_size = u32::from_be_bytes(header[0..4].try_into().unwrap()) as u64;
+        let is_target = &header[4..8] == target;
+
+        let (content_offset, total_size): (u64, u64) = if raw_size == 1 {
+            let mut ext = [0u8; 8];
+            reader.read_exact(&mut ext).ok()?;
+            (16, u64::from_be_bytes(ext))
+        } else if raw_size == 0 {
+            (8, u64::MAX) // extends to EOF
+        } else {
+            (8, raw_size)
+        };
+
+        if is_target {
+            return Some(box_start + content_offset);
+        }
+
+        if total_size == u64::MAX || total_size < content_offset {
+            return None;
+        }
+        reader.seek(SeekFrom::Start(box_start + total_size)).ok()?;
+    }
+}
+
+/// Reads the creation_time from an MP4 file's mvhd box and returns it as
+/// Unix milliseconds. Returns None if the file can't be parsed or has no time.
+///
+/// The MP4 spec requires creation_time to be UTC, but many cameras store local
+/// time in this field — matching the behaviour of FAT filesystem timestamps.
+fn read_mp4_creation_ms(path: &std::path::Path) -> Option<i64> {
+    use std::io::{Read, Seek, SeekFrom};
+    let file = std::fs::File::open(path).ok()?;
+    let mut reader = std::io::BufReader::new(file);
+
+    let moov_content = find_mp4_box(&mut reader, b"moov")?;
+    reader.seek(SeekFrom::Start(moov_content)).ok()?;
+    find_mp4_box(&mut reader, b"mvhd")?;
+
+    // mvhd: 1 byte version + 3 bytes flags, then creation_time
+    let mut buf4 = [0u8; 4];
+    reader.read_exact(&mut buf4).ok()?;
+    let version = buf4[0];
+
+    let creation_secs: u64 = if version == 0 {
+        reader.read_exact(&mut buf4).ok()?;
+        u32::from_be_bytes(buf4) as u64
+    } else {
+        let mut buf8 = [0u8; 8];
+        reader.read_exact(&mut buf8).ok()?;
+        u64::from_be_bytes(buf8)
+    };
+
+    if creation_secs == 0 {
+        return None;
+    }
+
+    // MP4 epoch is 1904-01-01 UTC; Unix epoch is 1970-01-01. Difference: 2082844800 s.
+    const MP4_EPOCH_OFFSET: i64 = 2082844800;
+    let unix_ms = creation_secs as i64 - MP4_EPOCH_OFFSET;
+    if unix_ms < 0 {
+        return None;
+    }
+    Some(unix_ms * 1000)
+}
+
 #[tauri::command]
 async fn open_video_folder(app: tauri::AppHandle) -> Result<Option<VideoFolderResult>, String> {
     use tauri_plugin_dialog::DialogExt;
@@ -110,13 +187,22 @@ async fn open_video_folder(app: tauri::AppHandle) -> Result<Option<VideoFolderRe
         let name = entry.file_name().to_string_lossy().to_string();
         let ext = name.rsplit('.').next().unwrap_or("").to_lowercase();
         if !name.starts_with("._") && video_extensions.contains(&ext.as_str()) {
-            let metadata = entry.metadata().map_err(|e| e.to_string())?;
-            let modified_ms = metadata
-                .modified()
-                .map_err(|e| e.to_string())?
-                .duration_since(std::time::UNIX_EPOCH)
-                .unwrap_or_default()
-                .as_millis() as i64;
+            let path = entry.path();
+            let modified_ms = if ext == "mp4" {
+                read_mp4_creation_ms(&path).unwrap_or_else(|| {
+                    entry.metadata().ok()
+                        .and_then(|m| m.modified().ok())
+                        .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok())
+                        .map(|d| d.as_millis() as i64)
+                        .unwrap_or(0)
+                })
+            } else {
+                entry.metadata().map_err(|e| e.to_string())?
+                    .modified().map_err(|e| e.to_string())?
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .unwrap_or_default()
+                    .as_millis() as i64
+            };
             videos.push(VideoInfo { name, modified_ms });
         }
     }

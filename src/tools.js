@@ -430,13 +430,13 @@ async function changeVideo() {
 
 function parseDateAndTime(videoDateObj) {
     if (videoDateObj) {
-        const year = videoDateObj.getFullYear();
-        const month = (videoDateObj.getMonth() + 1).toString().padStart(2, '0');
-        const day = videoDateObj.getDate().toString().padStart(2, '0');
+        const year = videoDateObj.getUTCFullYear();
+        const month = (videoDateObj.getUTCMonth() + 1).toString().padStart(2, '0');
+        const day = videoDateObj.getUTCDate().toString().padStart(2, '0');
         const parsedDate = `${year}-${month}-${day}`;
 
-        const hours = videoDateObj.getHours().toString().padStart(2, '0');
-        const minutes = videoDateObj.getMinutes().toString().padStart(2, '0');
+        const hours = videoDateObj.getUTCHours().toString().padStart(2, '0');
+        const minutes = videoDateObj.getUTCMinutes().toString().padStart(2, '0');
         const parsedTime = `${hours}-${minutes}-00`;
 
         return { date: parsedDate, time: parsedTime };
